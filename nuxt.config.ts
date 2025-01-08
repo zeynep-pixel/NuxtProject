@@ -26,4 +26,8 @@ export default defineNuxtConfig({
   css: ["bootstrap/dist/css/bootstrap.css"],
   plugins: ["~/plugins/firebase.js"],
   compatibilityDate: "2025-01-07",
+  modules: ['@pinia/nuxt'],
+
+
+  
 });

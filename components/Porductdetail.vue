@@ -1,67 +1,88 @@
 <template>
-    <div class="container product-detail">
-      <div class="row">
-      
-        <div class="col-12">
-          <h6 class="text-uppercase">ÇOK SATANLAR</h6>
-          <h2 class="product-title">DİK YAKA BASIC TRİKO KAZAK</h2>
-          <h3 class="product-price">1.299 TL</h3>
-          <p class="product-description">
-            Dik yaka. Düşük omuz. Uzun kol. Elastik manşet. Yandan yırtmaçlı. Yumuşak dokulu.
-          </p>
-          <p class="product-discount"><span style="color: brown;">SEPETTE 909 TL</span></p>
-          
-        </div>
-      </div>
-  
-      <div class="row align-items-center">
-      
-        <div class="col-6">
-          <p><strong>Bordo</strong> | 23F1XD83</p>
-          <div class="color-options">
-            <span class="color-circle bg-bordo"></span>
-            <span class="color-circle bg-black"></span>
-            <span class="color-circle bg-beige"></span>
-          </div>
-        </div>
-        <div class="col-6 text-end">
-          <a href="#" class="size-table-link">ÖLÇÜ TABLOSU</a>
-        </div>
-      </div>
-  
-      <div class="row">
-       
-        <div class="col-12 size-options">
-          <button class="btn btn-outline-dark">S</button>
-          <button class="btn btn-outline-dark">M</button>
-          <button class="btn btn-outline-dark">L</button>
-        </div>
-      </div>
-  
-      <div class="row mt-3">
-        
-        <div class="col-12">
-          <p class="installment-info">
-            <i class="bi bi-credit-card"></i> VADE FARKSIZ PEŞİN FİYATINA 3 TAKSİT FIRSATI!!
-          </p>
-        </div>
-      </div>
-  
-      <div class="row mt-4">
-       
-        <div class="col-12">
-          <button class="btn btn-dark w-100">SEPETE EKLE</button>
-        </div>
+  <div class=" product-detail">
+    <div class="row">
+      <div class="col-12">
+        <h6 class="text-uppercase">ÇOK SATANLAR</h6>
+        <h2 class="product-title">{{ product?.title || 'Loading...' }}</h2> 
+        <h3 class="product-price">{{ product?.price }} TL</h3> 
+        <p class="product-description">{{ product?.description }}</p>  
+        <p class="product-discount">
+          <span style="color: brown;">{{ product?.discountedPrice }} TL</span>
+        </p>
       </div>
     </div>
-  </template>
-  
+
+    <div class="row align-items-center">
+      <div class="col-6">
+        <p><strong>{{ product?.color || 'Bordo' }}</strong> | 23F1XD83</p>
+        <div class="color-options">
+        
+          <span class="color-circle bg-bordo"></span>
+          <span class="color-circle bg-black"></span>
+          <span class="color-circle bg-beige"></span>
+        </div>
+      </div>
+      <div class="col-6 text-end">
+        <a href="#" class="size-table-link">ÖLÇÜ TABLOSU</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 size-options">
+        <button class="btn btn-outline-dark">S</button>
+        <button class="btn btn-outline-dark">M</button>
+        <button class="btn btn-outline-dark">L</button>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <p class="installment-info">
+          <i class="bi bi-credit-card"></i> VADE FARKSIZ PEŞİN FİYATINA 3 TAKSİT FIRSATI!!
+        </p>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12">
+        <button class="btn btn-dark w-100" @click="addProductToCart(product)">SEPETE EKLE</button>
+      </div>
+    </div style="padding-top:50px">
+    <Accardion/>
+  </div>
+</template>
+
   <script setup>
+  import { ref, onMounted } from 'vue';
+  import { useRoute } from 'vue-router';
+  import { useProducts } from '~/composables/useProducts';
+  import { useCart } from '~/composables/useCart';
+
+   const { addToCart } = useCart();
+  
+
+  
+  const product = ref(null);
+  const loading = ref(true);  
+  const route = useRoute();
+  const { fetchProductById } = useProducts();
+  
+  onMounted(async () => {
+    const id = route.params.id; 
+    console.log("Product ID:", id);  
+    product.value = await fetchProductById(id); 
+    loading.value = false; 
+  });
+
+
+  const addProductToCart = (product) => {
+  addToCart(product);
+};
   </script>
   
   <style scoped>
   .product-detail {
-    margin-top: 20px;
+    
     width: 500px;
   }
   

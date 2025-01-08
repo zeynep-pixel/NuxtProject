@@ -1,13 +1,14 @@
-import { ref, onMounted } from 'vue';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import { getDocs, doc, getDoc, collection, getFirestore } from 'firebase/firestore';
-import { useNuxtApp } from '#app'; 
- // To access the app context in Nuxt
+import { useNuxtApp } from '#app'; // To access the app context in Nuxt
 
-export const useProducts = () => {
+export const useProductsStore = defineStore('products', () => {
   const products = ref([]);
   const { $firebaseApp } = useNuxtApp(); // Access Firebase app from Nuxt context
   const db = getFirestore($firebaseApp); // Initialize Firestore using the Firebase app
 
+  // Ürünleri Firestore'dan al
   const fetchProducts = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "products"));
@@ -15,12 +16,12 @@ export const useProducts = () => {
         const data = doc.data();
         console.log(data); // Log the product data for debugging
 
-        // Ensure currentImageIndex and images are handled correctly
+        // currentImageIndex ve images'i düzgün şekilde ele al
         return {
           id: doc.id,
           ...data,
-          currentImageIndex: data.currentImageIndex || 0, // Default to 0 if missing
-          images: data.images || [] // Default to empty array if images are missing
+          currentImageIndex: data.currentImageIndex || 0, // Eksikse 0 olarak ayarla
+          images: data.images || [] // Eksikse boş dizi olarak ayarla
         };
       });
     } catch (error) {
@@ -28,10 +29,7 @@ export const useProducts = () => {
     }
   };
 
-  onMounted(() => {
-    fetchProducts();
-  });
-
+  // Ürün ID'sine göre veriyi al
   const fetchProductById = async (id) => {
     try {
       const docRef = doc(db, "products", id);
@@ -49,5 +47,9 @@ export const useProducts = () => {
     }
   };
 
-  return { products , fetchProductById};
-};
+  return { 
+    products, 
+    fetchProducts, 
+    fetchProductById
+  };
+});

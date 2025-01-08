@@ -1,15 +1,14 @@
 <template>
   <div class="form-container">
-   
     <h2 class="form-title">GİRİŞ YAP</h2>
 
-     <!-- Displaying error or success messages -->
-     <div v-if="errorMessage" class="error-message">
-      <p>{{ errorMessage }}</p>
+    <!-- Hata veya başarı mesajlarının görüntülenmesi -->
+    <div v-if="auth.errorMessage" class="error-message">
+      <p>{{ auth.errorMessage }}</p>
     </div>
 
-    <div v-if="successMessage" class="success-message">
-      <p>{{ successMessage }}</p>
+    <div v-if="auth.successMessage" class="success-message">
+      <p>{{ auth.successMessage }}</p>
     </div>
 
     <div class="form-group">
@@ -41,48 +40,56 @@
       >
         GİRİŞ YAP
       </button>
-      <!-- Keeping the "ÜYE OL" button, but it won't do anything -->
       <button 
-        class="btn btn-register" 
-        
+        class="btn btn-register"
+        @click="handleRegister"
       >
         ÜYE OL
       </button>
     </div>
-
-    
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { useAuth } from "~/composables/useAuth";
+import { useAuthStore } from "~/stores/auth"; // Pinia store
+import { useRouter } from "vue-router"; 
 
 const email = ref("");
 const password = ref("");
-const errorMessage = ref("");  // For error messages
-const successMessage = ref("");  // For success messages
 
-const { login } = useAuth();
+const auth = useAuthStore(); // Pinia store instance
+const router = useRouter(); 
 
+// Giriş yapma işlemi
 const handleLogin = async () => {
   try {
-    const user = await login(email.value, password.value);
-    successMessage.value = `Giriş başarılı! Hoş geldiniz`;
-    errorMessage.value = ""; // Clear error message if login is successful
-  } catch (error) {
-    // Handling specific error messages
-    if (error.message.includes("wrong-password")) {
-      errorMessage.value = "Şifre yanlış";
-    } else if (error.message.includes("user-not-found")) {
-      errorMessage.value = "E-posta bulunamadı";
-    } else {
-      errorMessage.value = "Hatalı Giriş ";
+    await auth.login(email.value, password.value);
+    if (auth.user) {
+      router.push("/account"); // Başarılı giriş sonrası yönlendirme
     }
-    successMessage.value = ""; // Clear success message if there's an error
+  } catch (error) {
+    console.error("Login error:", error.message);
+  }
+};
+
+// Kayıt olma işlemi
+const handleRegister = async () => {
+  try {
+    await auth.register(email.value, password.value);
+    if (auth.user) {
+      router.push("/account"); // Başarılı kayıt sonrası yönlendirme
+    }
+  } catch (error) {
+    console.error("Registration error:", error.message);
   }
 };
 </script>
+
+<style scoped>
+/* Stil eklemek isterseniz burada stil tanımlamaları yapabilirsiniz */
+</style>
+
 
 <style lang="scss" scoped>
 .form-container {

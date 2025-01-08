@@ -1,10 +1,10 @@
 <template>
-  <div class="row justify-content-center">
+  <div class="row justify-content-center" >
     <div v-for="(item, index) in products" :key="index" class="product">
       <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <div class="carousel-image-container">
+            <div class="carousel-image-container" @click="navigateToProduct(item.id)" style="cursor: pointer;">
               <img :src="item.images[item.currentImageIndex]" class="d-block w-100" alt="...">
               <div class="size-box">
                 <p>S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L</p>
@@ -38,10 +38,15 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useProducts } from '~/composables/useProducts';
 
 // Fetch the products from the composable
 const { products } = useProducts();
+const router = useRouter();
+const navigateToProduct = (id) => {
+  router.push(`/product/${id}`); // Ürün detay sayfasına yönlendirme
+};
 
 // Image switching functions
 const nextImage = (index) => {

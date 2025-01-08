@@ -33,7 +33,7 @@
         </span>
       </button>
 
-      <button class="icon-button">
+      <button class="icon-button" >
         <span
           style="font-family: Open Sans Condensed, sans-serif; font-weight: 700; font-size: 13px;"
         >
@@ -71,10 +71,16 @@
       </ul>
     </div>
   </div>
+
+  
 </template>
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuth } from '~/composables/useAuth';
+
+
+const { isAuthenticated } = useAuth();
 
 const router = useRouter();
 
@@ -86,12 +92,18 @@ const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
 
-const navigateToLgn = () => {
-  router.push('/lgn');
-};
+
 
 const navigateToIndex = () => {
   router.push('/');
+};
+
+const navigateToLgn = () => {
+  if (isAuthenticated.value) {
+    router.push('/account'); // Kullanıcı oturum açtıysa hesap sayfasına yönlendir
+  } else {
+    router.push('/lgn'); // Oturum açmadıysa giriş yap sayfasına yönlendir
+  }
 };
 </script>
 

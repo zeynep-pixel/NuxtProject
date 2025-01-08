@@ -1,5 +1,5 @@
 <template>
-    <div class="accordion-container">
+    <div >
       <div class="accordion">
         <div class="accordion-item">
           <div class="accordion-header">
@@ -109,12 +109,7 @@ Satın aldığın ürünleri iade etmek için <a href="#">İade Formu’nu </a>e
   </script>
   
   <style scoped>
-  .accordion-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; 
-  }
+ 
   
  
   .accordion {
@@ -177,7 +172,7 @@ Satın aldığın ürünleri iade etmek için <a href="#">İade Formu’nu </a>e
 }
 
 .accordion-body-wrapper.open {
-  max-height: 200px; 
+  max-height: 100px; 
 }
 
   
