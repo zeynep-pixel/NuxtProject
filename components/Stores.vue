@@ -24,11 +24,20 @@
 </template>
 
 <script setup>
-import { useStores } from '~/composables/useStores';
+import { onMounted } from 'vue';
+import { useStoresStore } from '~/stores/stores'; // Pinia store import
 
-// Fetch the stores from the composable
-const { stores } = useStores();
+// Fetch stores from the Pinia store
+const storesStore = useStoresStore();
+
+// Fetch stores when component is mounted
+onMounted(async () => {
+  await storesStore.fetchStores();
+});
+
+const stores = storesStore.stores;
 </script>
+
 
 <style scoped>
 .store-list-container {

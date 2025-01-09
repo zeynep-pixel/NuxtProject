@@ -1,12 +1,14 @@
-import { ref, onMounted } from 'vue';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import { getDocs, collection, getFirestore } from 'firebase/firestore';
 import { useNuxtApp } from '#app'; // To access the app context in Nuxt
 
-export const useStores = () => {
+export const useStoresStore = defineStore('stores', () => {
   const stores = ref([]);
   const { $firebaseApp } = useNuxtApp(); // Access Firebase app from Nuxt context
   const db = getFirestore($firebaseApp); // Initialize Firestore using the Firebase app
 
+  // Fetch stores from Firestore
   const fetchStores = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "stores"));
@@ -16,8 +18,8 @@ export const useStores = () => {
 
         // Ensure any required properties are handled
         return {
+          id: doc.id, // You may need to include an id property if not already present in the data
           ...data,
-          // You can add additional processing here if needed
         };
       });
     } catch (error) {
@@ -25,9 +27,5 @@ export const useStores = () => {
     }
   };
 
-  onMounted(() => {
-    fetchStores();
-  });
-
-  return { stores };
-};
+  return { stores, fetchStores };
+});

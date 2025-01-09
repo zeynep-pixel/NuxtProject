@@ -62,6 +62,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Kullanıcının oturum açıp açmadığını kontrol et
   const isAuthenticated = computed(() => !!user.value);
+  
 
   // Firestore'dan kullanıcı verilerini çekme
   const getUserData = async () => {

@@ -1,5 +1,5 @@
 <template>
-  <div class=" product-detail">
+  <div class="product-detail">
     <div class="row">
       <div class="col-12">
         <h6 class="text-uppercase">ÇOK SATANLAR</h6>
@@ -16,7 +16,6 @@
       <div class="col-6">
         <p><strong>{{ product?.color || 'Bordo' }}</strong> | 23F1XD83</p>
         <div class="color-options">
-        
           <span class="color-circle bg-bordo"></span>
           <span class="color-circle bg-black"></span>
           <span class="color-circle bg-beige"></span>
@@ -45,40 +44,45 @@
 
     <div class="row mt-4">
       <div class="col-12">
-        <button class="btn btn-dark w-100" @click="addProductToCart(product)">SEPETE EKLE</button>
+        <button class="btn btn-dark w-100" @click="addToCart" >SEPETE EKLE</button>
       </div>
     </div style="padding-top:50px">
-    <Accardion/>
+    <Accardion />
   </div>
 </template>
 
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import { useRoute } from 'vue-router';
-  import { useProducts } from '~/composables/useProducts';
-  import { useCart } from '~/composables/useCart';
-
-   const { addToCart } = useCart();
-  
-
-  
-  const product = ref(null);
-  const loading = ref(true);  
-  const route = useRoute();
-  const { fetchProductById } = useProducts();
-  
-  onMounted(async () => {
-    const id = route.params.id; 
-    console.log("Product ID:", id);  
-    product.value = await fetchProductById(id); 
-    loading.value = false; 
-  });
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useProductsStore } from '~/stores/products';  // Pinia store'u import et
+import { useCartStore } from '~/stores/cart'; 
 
 
-  const addProductToCart = (product) => {
-  addToCart(product);
+// Sepete ürün ekleme fonksiyonu
+const route = useRoute();  // Route'dan ürün ID'sini almak için
+const product = ref(null);  // Ürün bilgisini tutan ref
+const loading = ref(true);
+const productsStore = useProductsStore();
+const cartStore = useCartStore();  
+
+const { fetchProductById } = useProductsStore();  // Pinia store'dan ürün çekme fonksiyonu
+
+// OnMounted hook'u ile ürünü ID'ye göre çekme
+onMounted(async () => {
+  const id = route.params.id;  // Route parametrelerinden ID'yi al
+  console.log("Product ID:", id);  
+  product.value = await fetchProductById(id);  // Ürünü store'dan çek
+  loading.value = false;  // Yükleniyor durumu bitti
+});
+const addToCart = () => {
+  if (product.value) {
+    cartStore.addToCart(product.value); // Sepete ürün ekle
+  }
 };
-  </script>
+// Ürünü sepete ekleme fonksiyonu
+
+</script>
+
   
   <style scoped>
   .product-detail {

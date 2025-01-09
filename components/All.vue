@@ -1,7 +1,7 @@
 <template>
   <div class="row justify-content-center">
-    <div v-for="(item, index) in productsStore.products" :key="index" class="product">
-      <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+    <div v-for="(item, index) in productsStore.products" :key="item.id" class="product">
+      <div :id="'carouselExampleInterval' + index" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
           <div class="carousel-item active">
             <div class="carousel-image-container" @click="navigateToProduct(item.id)" style="cursor: pointer;">
@@ -23,11 +23,11 @@
             </div>
           </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev" @click="prevImage(index)">
+        <button class="carousel-control-prev" type="button" :data-bs-target="'#carouselExampleInterval' + index" data-bs-slide="prev" @click="prevImage(index)">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next" @click="nextImage(index)">
+        <button class="carousel-control-next" type="button" :data-bs-target="'#carouselExampleInterval' + index" data-bs-slide="next" @click="nextImage(index)">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Next</span>
         </button>
@@ -45,11 +45,12 @@ import { useProductsStore } from '~/stores/products'; // Pinia store import
 const productsStore = useProductsStore();
 const router = useRouter();
 
-// Fetch products when component mounts
+// Fetch all products when component mounts
 onMounted(async () => {
-  await productsStore.fetchProducts();
+  await productsStore.fetchAllProducts(); // Tüm ürünleri al
 });
 
+// Navigate to the product detail page
 const navigateToProduct = (id) => {
   router.push(`/product/${id}`); // Redirect to product detail page
 };
@@ -75,17 +76,26 @@ const prevImage = (index) => {
 </script>
 
 <style scoped>
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden; /* Yatay kaydırmayı engelle */
+}
+
 .row {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
+  max-width: 100%;
+  overflow: hidden; /* Fazladan kaydırmayı engelle */
 }
 
 .product {
-  width: calc(20% - 10px); 
+  width: calc(25% - 10px); /* Her bir ürün için %25 genişlik */
   min-width: 80px;
 }
+
 #carouselExampleInterval {
   position: relative;
 }
@@ -94,11 +104,11 @@ const prevImage = (index) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  overflow-x: hidden;
   padding-top: 100px;
   padding-left: 25px;
   width: 100%;
+  height: auto; /* İçeriğe göre yükseklik belirle */
+  overflow-x: hidden; /* Yatay kaydırmayı engelle */
 }
 
 .carousel-image-container {
@@ -166,7 +176,6 @@ const prevImage = (index) => {
 
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-
   color: white;
   width: 20px;
   height: 20px;
@@ -184,18 +193,19 @@ const prevImage = (index) => {
   font-weight: 700;
   color: brown;
   position: relative;
-  margin-left: 20px; /* Dikdörtgenin yanında boşluk bırakır */
+  margin-left: 20px;
 }
 
 .indirim-text::before {
   content: "";
   display: inline-block;
-  width: 4px; /* Dikdörtgenin genişliği */
-  height: 100%; /* Metnin yüksekliği kadar */
-  background-color: brown; /* Aynı renk */
+  width: 4px;
+  height: 100%;
+  background-color: brown;
   position: absolute;
-  left: -10px; /* Metinle dikdörtgen arasındaki boşluk */
-  
+  left: -10px;
   top: 0;
 }
-</style> 
+
+
+</style>
