@@ -48,8 +48,8 @@ export default {
         
       ],
       cards2:[
-      { imgSrc: "https://toucheprive.com/cdn/shop/files/onlinesub_sweat_cyber_900x.png?v=1733211762", link: "https://example.com/3" },
-      { imgSrc: "https://toucheprive.com/cdn/shop/files/onlinesub_takim_cyber_900x.png?v=1733211761", link: "https://example.com/4" },
+      { imgSrc: "https://toucheprive.com/cdn/shop/files/elbise_tr_900x.png?v=1736500131" },
+      { imgSrc: "https://toucheprive.com/cdn/shop/files/takim_tr_900x.png?v=1736500132", link: "https://example.com/4" },
       ]
     };
   },

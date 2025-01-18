@@ -48,7 +48,7 @@
   </nav>
 </template>
 
-<script setup>
+<script setup lang="ts">
 // Navbar'da pinia store kullanılacak
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';

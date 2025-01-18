@@ -77,7 +77,7 @@
 </template>
 
 
-<script setup>
+<script setup lang="ts">
 import { useRouter } from 'vue-router';  // Import the useRouter hook from Vue Router
 
 const router = useRouter();  // Initialize the router

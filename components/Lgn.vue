@@ -2,16 +2,8 @@
   <div class="form-container">
     <h2 class="form-title">GİRİŞ YAP</h2>
 
-    <!-- Hata veya başarı mesajlarının görüntülenmesi -->
-    <div v-if="errorMessage" class="error-message">
-      <p>{{ errorMessage }}</p>
-    </div>
-
-    <div v-if="successMessage" class="success-message">
-      <p>{{ successMessage }}</p>
-    </div>
-
-    <!-- E-posta ve şifre alanları -->
+  
+    
     <div class="form-group">
       <label for="email">E-posta</label>
       <input
@@ -51,7 +43,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { defineProps } from "vue";
 
@@ -101,8 +93,9 @@ const handleRegister = () => {
   justify-content: center;
   align-items: center;
   height: 100vh; 
-  padding: 20px;
   flex-direction: column;
+  height: 600px;
+
 }
 
 

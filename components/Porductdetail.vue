@@ -5,16 +5,16 @@
         <h6 class="text-uppercase">ÇOK SATANLAR</h6>
         <h2 class="product-title">{{ product?.title || 'Loading...' }}</h2>
         <h3 class="product-price">{{ product?.price }} TL</h3>
-        <p class="product-description">{{ product?.description }}</p>
+        <p class="product-description">{{ product?.detail }}</p>
         <p class="product-discount">
-          <span style="color: brown;">{{ product?.discountedPrice }} TL</span>
+          <span style="color: brown;">{{ product?.indirimli }}</span>
         </p>
       </div>
     </div>
 
     <div class="row align-items-center">
       <div class="col-6">
-        <p><strong>{{ product?.color || 'Bordo' }}</strong> | 23F1XD83</p>
+        <p><strong>{{ product?.color }}</strong> </p>
         <div class="color-options">
           <span class="color-circle bg-bordo"></span>
           <span class="color-circle bg-black"></span>
@@ -28,9 +28,9 @@
 
     <div class="row">
       <div class="col-12 size-options">
-        <button class="btn btn-outline-dark">S</button>
-        <button class="btn btn-outline-dark">M</button>
-        <button class="btn btn-outline-dark">L</button>
+        <button class="btn btn-outline-dark" v-for="(size, index) in product.size" 
+        :key="index" >{{size}}</button>
+       
       </div>
     </div>
 
@@ -54,8 +54,8 @@
   </div>
 </template>
 
-<script setup>
-import { defineProps, defineEmits } from 'vue';
+<script setup lang="ts">
+import { defineProps, defineEmits, ref } from 'vue';
 
 const props = defineProps({
   product: {
@@ -66,8 +66,26 @@ const props = defineProps({
 
 const emits = defineEmits(['add-to-cart']);
 
+// Seçilen beden
+const selectedSize = ref<string | null>(null);
+
+// Beden seçme fonksiyonu
+const selectSize = (size: string) => {
+  selectedSize.value = size;
+};
+
+// Sepete ekleme fonksiyonu
 const onAddToCart = () => {
-  emits('add-to-cart', product);
+  if (!selectedSize.value) {
+    alert('Lütfen bir beden seçin!');
+    return;
+  }
+
+  // Sepete ürün ekleme işlemi
+  emits('add-to-cart', {
+    ...props.product,
+    selectedSize: selectedSize.value, // Seçilen beden
+  });
 };
 </script>
 

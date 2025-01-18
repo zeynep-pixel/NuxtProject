@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 
-// CartItem tipi
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
   price: number;
@@ -11,7 +10,7 @@ interface CartItem {
 export const useCartStore = defineStore('cart', {
   state: () => ({
     isCartOpen: false,
-    items: [] as CartItem[], // items dizisi, CartItem tipi ile tanımlandı
+    items: [] as CartItem[],
   }),
   actions: {
     toggleCart() {
