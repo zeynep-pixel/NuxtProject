@@ -56,14 +56,11 @@
       <div v-if="searchResults.length > 0" class="search-results">
         <ul>
           <li v-for="a in searchResults" :key="a.id">
-            <a href="#" @click.prevent="navigateToProduct(a.id)">{{ a.title }}</a>
+            <a href="javascript:void(0)" @click.prevent="navigateToProduct(a.id)">
+  {{ a.title }}
+</a>
           </li>
         </ul>
-      </div>
-
-      <!-- Arama Sonucu Yoksa Mesajı -->
-      <div v-else-if="searchQuery && searchResults.length === 0" class="no-results">
-        <p>No products found</p>
       </div>
     </div>
   </div>
@@ -136,9 +133,10 @@ const searchProducts = async () => {
   );
 };
 
-// Navigate to product detail page
+// navigateToProduct fonksiyonu
 const navigateToProduct = (id: string) => {
-  router.push(`/product/${id}`); // Navigate to product detail page
+  console.log("Function triggered for product id:", id); 
+  router.push(`/product/${id}`); // Redirect to product detail page
 };
 
 // Arama açma/kapama
@@ -149,6 +147,7 @@ const toggleSearch = () => {
 };
 </script>
 
+
 <style scoped>
 /* Genel layout için stil */
 
@@ -158,6 +157,48 @@ main {
   min-height: calc(100vh - 90px); /* Navbar ve Footer arasında alan */
   display: flex;
   flex-direction: column;
+}
+/* Fullscreen Menu */
+.fullscreen-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(239, 235, 235, 0.9);
+  display: flex;
+  overflow-y: auto; 
+  z-index: 999;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.menu-content {
+  font-family: "Open Sans Condensed", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  padding-top: 60px;
+  width: 80%;
+  max-width: 400px;
+}
+
+.menu-content ul {
+  list-style: none;
+}
+
+.menu-content li {
+  margin: 30px 0;
+}
+
+.menu-content a {
+  text-decoration: none;
+  color: #0d0d0d;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.fullscreen-menu .menu-content a:hover {
+  color: #414142;
 }
 
 /* Fullscreen style for search results */
