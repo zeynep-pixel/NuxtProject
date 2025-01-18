@@ -33,7 +33,6 @@ onMounted(async () => {
   loading.value = false;
 });
 
-// Sepete ekleme fonksiyonu
 const addToCart = (product: Product & { selectedSize: string }) => {
   const cartItemId = `${product.id}-${product.selectedSize}`;
   const existingItem = cartStore.items.find(item => item.id === cartItemId);
@@ -41,16 +40,19 @@ const addToCart = (product: Product & { selectedSize: string }) => {
   console.log('Sepetteki öğeler:', cartStore.items);  // Sepetteki öğeleri kontrol et
   if (existingItem) {
     console.log('Mevcut ürün bulundu:', existingItem);
-    existingItem.quantity++;
+    existingItem.quantity++;  // Quantity arttırılıyor
+    // Güncellenmiş fiyatı hesapla
+    existingItem.price = (product.price ?? 0) * existingItem.quantity; // Use fallback price of 0
   } else {
     console.log('Yeni ürün ekleniyor');
     const cartItem: CartItem = {
       id: cartItemId,
       title: `${product.title}`,
-      price: product.price || 0,
+      price: product.price ?? 0,  // Default to 0 if price is undefined
       size: product.selectedSize,
-      quantity: 1,
+      quantity: 1,  // İlk quantity 1
       images: product.images || [],
+      indirimli: (product as any).indirimli ?? 0,
       selectedSize: product.selectedSize,
       color: product.color
     };

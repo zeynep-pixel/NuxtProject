@@ -8,8 +8,6 @@
       <h2>SEPET ({{ totalQuantity }})</h2>
       <div v-if="totalPrice > 1500">Ücretsiz Kargo!</div>
 
-
-      <!-- Kaydırılabilir sepet öğeleri container'ı -->
       <div class="cart-items-container">
         <div v-for="item in cartItems" :key="item.id" class="cart-item">
           <img :src="item.images[0]" alt="Product Image" class="product-image" />
@@ -17,20 +15,25 @@
           <div class="product-info">
             <div class="product-title-price" style="display: flex; justify-content: space-between;">
               <div class="product-title">{{ item.title }}</div>
-              <div class="product-price">{{ item.price }} TL</div>
+              <div v-if="item.indirimli > 0" class="product-price">{{ item.indirimli * item.quantity }} TL</div>
+              <div v-else class="product-price">{{ item.price * item.quantity }} TL</div>
             </div>
             <div class="product-price">BEDEN: {{ item.size }} </div>
-            <button class="btn btn-dark" @click="removeFromCart(item.id)" style="margin-top: 80px;">Sil</button>
+
+            <div class="quantity-container">
+              <button @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 0" class="quantity-button">-</button>
+              <div class="quantity-display">{{ item.quantity }}</div>
+              <button @click="increaseQuantity(item.id)" class="quantity-button">+</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Ara toplam ve tamamla butonu sabit altta -->
       <div class="cart-total">
         <div class="total-price-container">
-  <div>ARA TOPLAM:</div>
-  <div class="total-price">{{ totalPrice }} TL</div>
-</div>
+          <div>ARA TOPLAM:</div>
+          <div class="total-price">{{ totalPrice }} TL</div>
+        </div>
         <button @click="clearCart" class="btn btn-dark w-100">ALIŞVERİŞİ TAMAMLA</button>
       </div>
     </div>
@@ -38,18 +41,17 @@
     <div v-else>
       <div class="cart-container" style="margin-top: 150px;">
         <button class="icon-button">
-          <span class="material-symbols-outlined" style="font-size: 40px">shopping_bag</span>
+          <span class="material-symbols-outlined" style="font-size: 40px; margin-left: 200px;">shopping_bag</span>
         </button>
-        <h2>Sepetinizde Ürün Yok</h2>
+        <h2 style=" margin-left: 80px;">Sepetinizde Ürün Yok</h2>
       </div>
 
-      <button class="btn btn-dark" style="width: 190px; margin-left: 130px;" @click="navigateToAllProduct">
+      <button class="btn btn-dark" style="width: 190px; margin-left: 130px; margin-top: 56px;" @click="navigateToAllProduct">
         <div>ALIŞVERİŞE BAŞLA</div>
       </button>
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { computed } from 'vue';
@@ -58,26 +60,29 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const cartStore = useCartStore();
-const cartItems = computed(() => cartStore.items); // Sepet ürünlerini al
-const isCartOpen = computed(() => cartStore.isCartOpen); // Sepet durumu
-const totalPrice = computed(() => cartStore.totalPrice); 
+const cartItems = computed(() => cartStore.items);
+const isCartOpen = computed(() => cartStore.isCartOpen);
+const totalPrice = computed(() => cartStore.totalPrice);
 const totalQuantity = computed(() => cartStore.totalQuantity);
 
-
 const toggleCart = () => {
-  cartStore.toggleCart(); // Sepet durumunu toggle et
+  cartStore.toggleCart();
 };
 
-const removeFromCart = (productId) => {
-  cartStore.removeFromCart(productId); // Ürün silme
+const increaseQuantity = (productId) => {
+  cartStore.updateQuantity(productId, 1);
+};
+
+const decreaseQuantity = (productId) => {
+  cartStore.updateQuantity(productId, -1);
 };
 
 const clearCart = () => {
-  cartStore.clearCart(); // Sepeti temizleme
+  cartStore.clearCart();
 };
 
 const navigateToAllProduct = () => {
-  router.push('/allProduct'); // Tüm ürünler sayfasına yönlendirme
+  router.push('/allProduct');
 };
 </script>
 
@@ -111,12 +116,10 @@ const navigateToAllProduct = () => {
 
 .cart-items-container {
   flex-grow: 1;
-  max-height: 70vh; /* Burada %70 kadar bir yükseklik tanımlandı */
-  overflow-y: auto; /* Dikey kaydırma ekler */
+  max-height: 70vh;
+  overflow-y: auto;
   padding-right: 10px;
   margin-bottom: 20px;
- 
-  
 }
 
 .cart-item {
@@ -124,7 +127,7 @@ const navigateToAllProduct = () => {
   gap: 20px;
   margin-bottom: 20px;
   padding: 10px;
-  height: 200px; /* Sabit yükseklik */
+  height: 200px;
 }
 
 .product-image {
@@ -151,12 +154,12 @@ const navigateToAllProduct = () => {
   background-color: white;
   padding: 10px 0;
   border-top: 1px solid #ddd;
- 
 }
+
 .total-price-container {
   display: flex;
   justify-content: space-between;
-  width: 100%; /* İki öğe arasındaki alanı mümkün olan en geniş şekilde dağıtır */
+  width: 100%;
   padding-bottom: 30px;
 }
 
@@ -164,5 +167,31 @@ const navigateToAllProduct = () => {
   text-align: right;
 }
 
+.quantity-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px;
+  border: #333;
+}
 
+.quantity-button {
+  width: 30px;
+  height: 30px;
+  background-color: #f1f1f1;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.quantity-display {
+  width: 40px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+}
 </style>

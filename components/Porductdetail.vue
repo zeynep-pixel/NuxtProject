@@ -6,26 +6,13 @@
         <h2 class="product-title">{{ product?.title || 'Loading...' }}</h2>
         <h3 class="product-price">{{ product?.price }} TL</h3>
         <p class="product-description">{{ product?.detail }}</p>
-        <p class="product-discount">
+        <p v-if="product.indirimli > 0" class="product-discount">
           <span style="color: brown;">{{ product?.indirimli }} TL</span>
         </p>
       </div>
     </div>
 
-    <div class="row align-items-center">
-      <div class="col-6">
-        <p><strong>{{ product?.color }}</strong> </p>
-        <div class="color-options">
-          <span class="color-circle bg-bordo"></span>
-          <span class="color-circle bg-black"></span>
-          <span class="color-circle bg-beige"></span>
-        </div>
-      </div>
-      <div class="col-6 text-end">
-        <a href="#" class="size-table-link">ÖLÇÜ TABLOSU</a>
-      </div>
-    </div>
-
+ 
     <div v-if="sizeError" class="size-error">
       <i class="bi bi-exclamation-triangle-fill"></i> Lütfen bir beden seçiniz.
     </div>

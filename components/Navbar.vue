@@ -8,7 +8,7 @@
       </button>
 
       <!-- Ara Butonu -->
-      <button class="text-icon-button">
+      <button class="text-icon-button" @click="toggleSearch">
         <span class="material-icons">search</span>
         <span><div>Ara</div></span>
       </button>
@@ -46,51 +46,98 @@
       </button>
     </div>
   </nav>
+
+  <div v-if="isSearchOpen" class="search-bar-overlay">
+    <div class="search-bar">
+      <input type="text" placeholder="Ara..." v-model="searchQuery" @input="searchProducts" />
+      <button class="search-button">
+        <span class="material-icons">search</span>
+      </button>
+      <button class="close-button" @click="toggleSearch">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Display search results below the search bar -->
+    <div v-if="searchResults.length > 0" class="search-results">
+      <ul>
+        <li v-for="a in searchResults" :key="a.id">
+          <a href="#">{{ a.title }}</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Display no results message -->
+    <div v-else-if="searchQuery && searchResults.length === 0" class="no-results">
+      <p>No products found</p>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-// Navbar'da pinia store kullanılacak
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMenuStore } from '~/stores/menu';
 import { useCartStore } from '~/stores/cart';
-import { useAuthStore } from '~/stores/auth';  // Auth store'ı dahil et
+import { useAuthStore } from '~/stores/auth';
+import { useProductsStore } from '~/stores/products'; // Products store
 
+// Store'lar
 const router = useRouter();
-const menuStore = useMenuStore();  // Menu store'ı dahil et
-const cartStore = useCartStore();  // Cart store'ı dahil et
-const authStore = useAuthStore();  // Auth store'ı dahil et
+const menuStore = useMenuStore();
+const cartStore = useCartStore();
+const authStore = useAuthStore();
+const productsStore = useProductsStore();
 
-// Menu ve Cart durumları
 const isMenuOpen = computed(() => menuStore.isMenuOpen);
 const isCartOpen = computed(() => cartStore.isCartOpen);
-const isAuthenticated = computed(() => authStore.isAuthenticated); // Kullanıcı doğrulaması
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+
+const isSearchOpen = ref(false); // Arama durumu
+const searchQuery = ref(''); // Arama sorgusu
+const searchResults = ref<Product[]>([]); // Arama sonuçları
 
 // Menü açma/kapama
-const toggleMenu = () => {
-  menuStore.toggleMenu(); // Menü durumu değiştir
+const toggleMenu = (): void => {
+  menuStore.toggleMenu();
 };
 
 // Sepet açma/kapama
-const toggleCart = () => {
-  cartStore.toggleCart(); // Sepet durumu değiştir
+const toggleCart = (): void => {
+  cartStore.toggleCart();
 };
 
-// Sayfa yönlendirmeleri
-const navigateToIndex = () => {
+// Hesap Butonu İşlemi
+const navigateToLgn = (): void => {
+  if (isAuthenticated.value) {
+    router.push('/account'); // Eğer giriş yaptıysa account sayfasına yönlendir
+  } else {
+    router.push('/lgn'); // Giriş yapmamışsa login sayfasına yönlendir
+  }
+};
+
+// Ana Sayfaya Gitme
+const navigateToIndex = (): void => {
   router.push('/');
 };
 
-const navigateToAllProduct = () => {
-  router.push('/allProduct');
+// Arama işlemi
+const searchProducts = async () => {
+  if (!searchQuery.value) {
+    searchResults.value = [];
+    return;
+  }
+  await productsStore.fetchAllProducts(); // Ürünleri yükle
+  searchResults.value = productsStore.products.filter((product) =>
+    product.title?.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
 };
 
-const navigateToLgn = () => {
-  if (isAuthenticated.value) {
-    router.push('/account');  // Eğer giriş yaptıysa account sayfasına yönlendir
-  } else {
-    router.push('/lgn');  // Giriş yapmamışsa login sayfasına yönlendir
-  }
+// Arama açma/kapama
+const toggleSearch = () => {
+  isSearchOpen.value = !isSearchOpen.value;
+  searchQuery.value = ''; // Arama kutusunu sıfırla
+  searchResults.value = []; // Arama sonuçlarını sıfırla
 };
 </script>
 
@@ -280,4 +327,96 @@ const navigateToLgn = () => {
 .btn-submit:hover {
   background-color: #333; /* Hover efekti */
 }
+
+
+
+.search-bar-overlay {
+  position: fixed;
+  width: 100%;
+  height: 100vh; /* Tüm ekran yüksekliği */
+  background-color: rgba(255, 255, 255, 0.9); /* Hafif saydam beyaz arka plan */
+  display: flex;
+  justify-content: flex-start; /* İçeriği üstten başlat */
+  align-items: center;
+  z-index: 1000;
+  flex-direction: column; /* Arama çubuğu ve sonuçlar dikeyde olacak */
+}
+
+.search-bar {
+  display: flex;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+  width: 60%;
+  margin-top: 20px; /* Üstten mesafe */
+}
+
+.search-bar input {
+  flex: 1;
+  background-color: #e2e2e2;
+  border: none;
+  outline: none;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.search-button,
+.close-button {
+  border: none;
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.search-button {
+  margin-left: 10px;
+}
+
+.close-button {
+  margin-left: 10px;
+  color: #333;
+}
+
+/* Arama sonuçları düzenlemeleri */
+.search-results {
+  width: 100%; /* Sayfa genişliğini kaplasın */
+  padding: 50px;
+  box-sizing: border-box; /* Padding dahil olsun */
+  background-color: #fff;
+ /* Arama çubuğu ile sonuçlar arasında mesafe */
+  overflow-y: auto; /* Eğer fazla sonuç olursa kaydırılabilir olsun */
+}
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-results li {
+  margin: 15px 0;
+  font-size: 18px;
+  font-weight: 500;
+  padding-bottom: 20px;
+}
+
+.search-results a {
+  text-decoration: none;
+  color: #333;
+}
+
+.search-results a:hover {
+  color: #414142; /* Hover rengi */
+}
+
+/* No results message */
+.no-results {
+  width: 100%; /* Sayfa genişliğini kaplasın */
+  margin-top: 20px;
+  text-align: center;
+  color: gray;
+  font-size: 16px;
+}
+
+
 </style>

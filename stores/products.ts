@@ -101,5 +101,27 @@ export const useProductsStore = defineStore('products', () => {
     }
   };
 
-  return { products, fetchProducts, fetchAllProducts, fetchProductById };
+
+  // Firestore'dan belirli kelimeye sahip ürünleri filtreleme
+const searchProducts = async (query: string): Promise<Product[]> => {
+  try {
+    // Eğer ürünler zaten yüklüyse, bunlar üzerinde filtreleme yapabiliriz
+    if (products.value.length === 0) {
+      await fetchAllProducts(); // Eğer ürünler yoksa tüm ürünleri yükle
+    }
+
+    const filteredProducts = products.value.filter((product) =>
+      product.title?.toLowerCase().includes(query.toLowerCase())
+    );
+
+    console.log('Filtered products based on search:', filteredProducts);
+    return filteredProducts;
+  } catch (error) {
+    console.error('Error searching products:', error);
+    return [];
+  }
+};
+
+
+  return { products, fetchProducts, fetchAllProducts, fetchProductById , searchProducts};
 });

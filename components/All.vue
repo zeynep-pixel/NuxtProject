@@ -17,7 +17,7 @@
               <p style="font-family: Open Sans Condensed, sans-serif; font-size: 13px; font-weight: 700;">
                 {{ item.price }} TL
               </p>
-              <p class="indirim-text">
+              <p v-if="item.indirimli > 0" class="indirim-text">
                 SEPETTE {{ item.indirimli }} TL
               </p>
             </div>
@@ -38,7 +38,10 @@
 
 <script setup>
 defineProps({
-  products: Array,
+  products: {
+    type: Array,
+    required: true
+  }
 });
 
 defineEmits(['navigate', 'nextImage', 'prevImage']);

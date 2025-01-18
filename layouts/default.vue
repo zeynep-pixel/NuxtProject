@@ -39,11 +39,38 @@
 
     <!-- Arka Plan (Overlay) -->
     <div v-if="isCartOpen" class="overlay" @click="toggleCart"></div>
+
+    <!-- Arama Barı -->
+    <div v-if="isSearchOpen" class="search-bar-overlay">
+      <div class="search-bar">
+        <input type="text" placeholder="Ara..." v-model="searchQuery" @input="searchProducts" />
+        <button class="search-button">
+          <span class="material-icons">search</span>
+        </button>
+        <button class="close-button" @click="toggleSearch">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <!-- Arama Sonuçları -->
+      <div v-if="searchResults.length > 0" class="search-results">
+        <ul>
+          <li v-for="a in searchResults" :key="a.id">
+            <a href="#" @click.prevent="navigateToProduct(a.id)">{{ a.title }}</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Arama Sonucu Yoksa Mesajı -->
+      <div v-else-if="searchQuery && searchResults.length === 0" class="no-results">
+        <p>No products found</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Navbar from '~/components/Navbar.vue';
 import Footer from '~/components/Footer.vue';
@@ -51,16 +78,23 @@ import CartSidebar from '~/components/CartSidebar.vue';
 import { useAuthStore } from '~/stores/auth';
 import { useCartStore } from '~/stores/cart';
 import { useMenuStore } from '~/stores/menu'; // Menu store'u dahil ediyoruz
+import { useProductsStore } from '~/stores/products'; // Products store
 
 // Store'lar
 const authStore = useAuthStore();
 const cartStore = useCartStore();
-const menuStore = useMenuStore(); // Menu store
+const menuStore = useMenuStore();
+const productsStore = useProductsStore(); // Pinia store'dan ürünleri getiriyoruz
 
 // Store'lar ile computed properties
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const isMenuOpen = computed(() => menuStore.isMenuOpen); // Menü durumu
 const isCartOpen = computed(() => cartStore.isCartOpen); // Sepet durumu
+
+// Arama durumu
+const isSearchOpen = ref(false); // Arama durumu
+const searchQuery = ref(''); // Kullanıcının arama sorgusu
+const searchResults = ref<Product[]>([]); // Arama sonuçları
 
 // Menü açma/kapama
 const toggleMenu = (): void => {
@@ -89,8 +123,31 @@ const navigateToLgn = (): void => {
     router.push('/lgn'); // Giriş yapmamışsa login sayfasına yönlendir
   }
 };
-</script>
 
+// Product search işlemi
+const searchProducts = async () => {
+  if (!searchQuery.value) {
+    searchResults.value = []; // Reset search results if query is empty
+    return;
+  }
+  await productsStore.fetchAllProducts(); // Ürünleri yükle
+  searchResults.value = productsStore.products.filter((product) =>
+    product.title?.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+};
+
+// Navigate to product detail page
+const navigateToProduct = (id: string) => {
+  router.push(`/product/${id}`); // Navigate to product detail page
+};
+
+// Arama açma/kapama
+const toggleSearch = () => {
+  isSearchOpen.value = !isSearchOpen.value;
+  searchQuery.value = ''; // Arama kutusunu sıfırla
+  searchResults.value = []; // Arama sonuçlarını sıfırla
+};
+</script>
 
 <style scoped>
 /* Genel layout için stil */
@@ -103,42 +160,40 @@ main {
   flex-direction: column;
 }
 
-.fullscreen-menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh; /* Tam ekran yüksekliği */
-  z-index: 999;
-  overflow: hidden; /* Menü dışına taşma olmasın */
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* İçeriğin üstten başlaması */
-}
-
-.menu-content {
-  width: 100%; /* Tüm ekran genişliğini kapla */
-  height: 100%; /* Tüm ekran yüksekliğini kapla */
-  background-color: rgba(255, 255, 255, 0.8); /* Menü arka planı beyaz */
+/* Fullscreen style for search results */
+.search-results {
+  width: 100%; /* Make the results take up the full width */
+  height: calc(100vh - 80px); /* Height minus the search bar */
+  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
   padding: 20px;
-  box-sizing: border-box; /* Padding, genişliğe dahil */
-  overflow-y: auto; /* Kaydırılabilirlik sağlandı */
+  box-sizing: border-box;
+  overflow-y: auto; /* Enable scrolling if necessary */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align items to the top */
 }
 
-.menu-content ul {
+.search-results ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.menu-content li {
+.search-results li {
   margin: 15px 0;
   padding-bottom: 20px;
 }
 
-.menu-content a {
+.search-results a {
   color: #333;
   text-decoration: none;
+  font-size: 18px;
+}
+
+.no-results {
+  text-align: center;
+  margin-top: 20px;
+  color: gray;
   font-size: 18px;
 }
 
