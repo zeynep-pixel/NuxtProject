@@ -24,11 +24,10 @@ const navigateToProduct = (id: string) => {
   router.push(`/product/${id}`);
 };
 
-// Image switching handlers
 const nextImage = (index: number) => {
   const product = products[index];
-  if (product && product.images && product.currentImageIndex < product.images.length - 1) {
-    product.currentImageIndex++;
+  if (product && product.images && product.currentImageIndex! < product.images.length - 1) {
+    product.currentImageIndex!++; // Non-null assertion
   } else {
     product.currentImageIndex = 0; // Loop back to the first image
   }
@@ -36,12 +35,13 @@ const nextImage = (index: number) => {
 
 const prevImage = (index: number) => {
   const product = products[index];
-  if (product && product.images && product.currentImageIndex > 0) {
-    product.currentImageIndex--;
+  if (product && product.images && product.currentImageIndex! > 0) {
+    product.currentImageIndex!--;
   } else {
-    product.currentImageIndex = product.images.length - 1; // Loop back to the last image
+    product.currentImageIndex = product.images!.length - 1; // Loop back to the last image
   }
 };
+
 </script>
 
 <style lang="scss" scoped>

@@ -8,6 +8,9 @@
       <h2>Sepetiniz</h2>
       <ul>
         <li v-for="item in cartItems" :key="item.id">
+          <!-- Ürün görselini göstermek için images dizisinden ilk resmi al -->
+          <img :src="item.images[0]" alt="Product Image" style="width: 100px; height: 150px;" />
+          
           <div>{{ item.name }} - {{ item.quantity }} x {{ item.price }} TL</div>
           <button @click="removeFromCart(item.id)">Sil</button>
         </li>
@@ -32,7 +35,6 @@
 </template>
 
 <script setup>
-// CartSidebar'da pinia store kullanılacak
 import { computed } from 'vue';
 import { useCartStore } from '~/stores/cart';
 import { useRouter } from 'vue-router';
@@ -40,6 +42,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const cartStore = useCartStore();
 const cartItems = computed(() => cartStore.items); // Sepet ürünlerini al
+
 
 const isCartOpen = computed(() => cartStore.isCartOpen); // Sepet durumu
 
@@ -59,7 +62,6 @@ const navigateToAllProduct = () => {
   router.push('/allProduct'); // Tüm ürünler sayfasına yönlendirme
 };
 </script>
-
 
 
 

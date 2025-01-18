@@ -10,6 +10,7 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
@@ -32,18 +33,19 @@ onMounted(async () => {
   loading.value = false;
 });
 
+// Sepete ekleme fonksiyonu
 const addToCart = (product: Product & { selectedSize: string }) => {
   const cartItem: CartItem = {
     id: `${product.id}-${product.selectedSize}`, // Ürün + beden kombinasyonu benzersiz id
     name: `${product.name} (${product.selectedSize})`,
     price: product.price || 0,
     quantity: 1,
+    images: product.images || [], // Görseller
   };
 
-  cartStore.addToCart(cartItem);
+  cartStore.addToCart(cartItem); // Pinia store'a ekle
 };
 </script>
-
 
 <style scoped>
 /* Buraya sayfa özel stil ekleyebilirsiniz */

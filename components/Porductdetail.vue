@@ -2,7 +2,7 @@
   <div class="product-detail">
     <div class="row">
       <div class="col-12">
-        <h6 class="text-uppercase">ÇOK SATANLAR</h6>
+        <h6 v-if="product?.mainPage" class="text-uppercase">ÇOK SATANLAR</h6>
         <h2 class="product-title">{{ product?.title || 'Loading...' }}</h2>
         <h3 class="product-price">{{ product?.price }} TL</h3>
         <p class="product-description">{{ product?.detail }}</p>
@@ -26,11 +26,23 @@
       </div>
     </div>
 
+    <div v-if="sizeError" class="size-error">
+      <i class="bi bi-exclamation-triangle-fill"></i> Lütfen bir beden seçiniz.
+    </div>
+
     <div class="row">
       <div class="col-12 size-options">
-        <button class="btn btn-outline-dark" v-for="(size, index) in product.size" 
-        :key="index" >{{size}}</button>
-       
+        <div class="size-buttons">
+          <button
+            v-for="(size, index) in product.size"
+            :key="index"
+            class="btn"
+            :class="{ 'btn-dark': size === selectedSize, 'btn-outline-dark': size !== selectedSize }"
+            @click="selectSize(size)"
+          >
+            {{ size }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -44,13 +56,16 @@
 
     <div class="row mt-4">
       <div class="col-12">
-        <button class="btn btn-dark w-100" @click="onAddToCart">SEPETE EKLE</button>
+        <button class="btn btn-dark w-100" @click="onAddToCart">
+          <div v-if="isAdded">SEPETE EKLENDİ</div>
+          <div v-else>SEPETE EKLE</div>
+        </button>
       </div>
     </div>
+
     <div style="padding-top: 30px;">
       <Accardion />
     </div>
-   
   </div>
 </template>
 
@@ -64,34 +79,38 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(['add-to-cart']);
+// Emit'i tanımlıyoruz
+const emit = defineEmits();
 
-// Seçilen beden
+const sizeError = ref(false);
+const isAdded = ref(false);
 const selectedSize = ref<string | null>(null);
 
 // Beden seçme fonksiyonu
 const selectSize = (size: string) => {
   selectedSize.value = size;
+  isAdded.value = false;
 };
 
 // Sepete ekleme fonksiyonu
 const onAddToCart = () => {
   if (!selectedSize.value) {
-    alert('Lütfen bir beden seçin!');
+    sizeError.value = true;
     return;
   }
+  sizeError.value = false;
+  isAdded.value = true;
 
-  // Sepete ürün ekleme işlemi
-  emits('add-to-cart', {
+  const cartItem = {
     ...props.product,
-    selectedSize: selectedSize.value, // Seçilen beden
-  });
+    selectedSize: selectedSize.value,  // Seçilen beden
+  };
+
+  // Ebeveyn bileşene add-to-cart olayı ile veriyi gönder
+  emit('add-to-cart', cartItem);
+    // CartItem'ı gönderiyoruz
 };
 </script>
-
-
-
-
 
 
   <style scoped>
@@ -172,5 +191,16 @@ const onAddToCart = () => {
     align-items: center;
     gap: 5px;
   }
+
+ 
+.size-buttons .btn {
+  margin-right: 10px; 
+  margin-bottom: 10px; 
+}
+
+.size-buttons .btn:last-child {
+  margin-right: 0;
+}
+
   </style>
   
