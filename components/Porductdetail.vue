@@ -3,9 +3,9 @@
     <div class="row">
       <div class="col-12">
         <h6 class="text-uppercase">ÇOK SATANLAR</h6>
-        <h2 class="product-title">{{ product?.title || 'Loading...' }}</h2> 
-        <h3 class="product-price">{{ product?.price }} TL</h3> 
-        <p class="product-description">{{ product?.description }}</p>  
+        <h2 class="product-title">{{ product?.title || 'Loading...' }}</h2>
+        <h3 class="product-price">{{ product?.price }} TL</h3>
+        <p class="product-description">{{ product?.description }}</p>
         <p class="product-discount">
           <span style="color: brown;">{{ product?.discountedPrice }} TL</span>
         </p>
@@ -44,46 +44,38 @@
 
     <div class="row mt-4">
       <div class="col-12">
-        <button class="btn btn-dark w-100" @click="addToCart" >SEPETE EKLE</button>
+        <button class="btn btn-dark w-100" @click="onAddToCart">SEPETE EKLE</button>
       </div>
-    </div style="padding-top:50px">
-    <Accardion />
+    </div>
+    <div style="padding-top: 30px;">
+      <Accardion />
+    </div>
+   
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { useProductsStore } from '~/stores/products';  // Pinia store'u import et
-import { useCartStore } from '~/stores/cart'; 
+import { defineProps, defineEmits } from 'vue';
 
-
-// Sepete ürün ekleme fonksiyonu
-const route = useRoute();  // Route'dan ürün ID'sini almak için
-const product = ref(null);  // Ürün bilgisini tutan ref
-const loading = ref(true);
-const productsStore = useProductsStore();
-const cartStore = useCartStore();  
-
-const { fetchProductById } = useProductsStore();  // Pinia store'dan ürün çekme fonksiyonu
-
-// OnMounted hook'u ile ürünü ID'ye göre çekme
-onMounted(async () => {
-  const id = route.params.id;  // Route parametrelerinden ID'yi al
-  console.log("Product ID:", id);  
-  product.value = await fetchProductById(id);  // Ürünü store'dan çek
-  loading.value = false;  // Yükleniyor durumu bitti
+const props = defineProps({
+  product: {
+    type: Object,
+    required: true,
+  },
 });
-const addToCart = () => {
-  if (product.value) {
-    cartStore.addToCart(product.value); // Sepete ürün ekle
-  }
-};
-// Ürünü sepete ekleme fonksiyonu
 
+const emits = defineEmits(['add-to-cart']);
+
+const onAddToCart = () => {
+  emits('add-to-cart', product);
+};
 </script>
 
-  
+
+
+
+
+
   <style scoped>
   .product-detail {
     

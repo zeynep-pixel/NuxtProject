@@ -1,6 +1,6 @@
 <template>
   <div class="row justify-content-center">
-    <div v-for="(item, index) in productsStore.products" :key="index" class="product">
+    <div v-for="(item, index) in products" :key="index" class="product">
       <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
           <div class="carousel-item active">
@@ -37,26 +37,24 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
-import { useProductsStore } from '~/stores/products'; // Pinia store import
 
-// Fetch the products from the Pinia store
-const productsStore = useProductsStore();
-const router = useRouter();
-
-// Fetch products when component mounts
-onMounted(async () => {
-  await productsStore.fetchProducts();
+const props = defineProps({
+  products: {
+    type: Array,
+    required: true,
+  },
 });
+
+const router = useRouter();
 
 const navigateToProduct = (id) => {
   router.push(`/product/${id}`); // Redirect to product detail page
 };
 
-// Image switching functions
 const nextImage = (index) => {
-  const product = productsStore.products[index];
+  const product = props.products[index];
   if (product && product.images && product.currentImageIndex < product.images.length - 1) {
     product.currentImageIndex++;
   } else {
@@ -65,7 +63,7 @@ const nextImage = (index) => {
 };
 
 const prevImage = (index) => {
-  const product = productsStore.products[index];
+  const product = props.products[index];
   if (product && product.images && product.currentImageIndex > 0) {
     product.currentImageIndex--;
   } else {
@@ -73,6 +71,7 @@ const prevImage = (index) => {
   }
 };
 </script>
+
 
 <style scoped>
 .row {

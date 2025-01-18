@@ -1,9 +1,9 @@
 <template>
     <div>
-      <Nuxt />
+      
       <Navbar />
       <Contact/>
-      <Footer/>
+      
     </div>
   </template>
   

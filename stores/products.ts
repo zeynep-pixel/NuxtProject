@@ -2,22 +2,36 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getDocs, getDoc, doc, collection, getFirestore } from 'firebase/firestore';
 import { useNuxtApp } from '#app'; // To access Nuxt app context
+import type { FirebaseApp } from 'firebase/app'; // Import FirebaseApp type
+
+// Define a Product interface
+interface Product {
+  id: string;
+  name?: string;
+  description?: string;
+  price?: number;
+  mainPage?: boolean;
+  currentImageIndex?: number;
+  images?: string[];
+}
 
 export const useProductsStore = defineStore('products', () => {
-  const products = ref([]);
+  const products = ref<Product[]>([]);
   const { $firebaseApp } = useNuxtApp(); // Access Firebase app from Nuxt context
-  const db = getFirestore($firebaseApp); // Initialize Firestore using the Firebase app
+
+  // Assert $firebaseApp is of type FirebaseApp
+  const db = getFirestore($firebaseApp as FirebaseApp); // Cast $firebaseApp to FirebaseApp
 
   // Fetch products from Firestore where mainPage is true
-  const fetchProducts = async () => {
+  const fetchProducts = async (): Promise<void> => {
     try {
       const querySnapshot = await getDocs(collection(db, "products"));
-      const fetchedProductIds = new Set(); // To avoid duplicates
-      const filteredProducts = [];
+      const fetchedProductIds = new Set<string>(); // To avoid duplicates
+      const filteredProducts: Product[] = [];
 
       querySnapshot.docs.forEach(doc => {
         const data = doc.data();
-        const product = {
+        const product: Product = {
           id: doc.id,
           ...data,
           currentImageIndex: data.currentImageIndex || 0,
@@ -39,14 +53,14 @@ export const useProductsStore = defineStore('products', () => {
   };
 
   // Fetch all products from Firestore (without mainPage check)
-  const fetchAllProducts = async () => {
+  const fetchAllProducts = async (): Promise<void> => {
     try {
       const querySnapshot = await getDocs(collection(db, "products"));
-      const allProducts = [];
+      const allProducts: Product[] = [];
 
       querySnapshot.docs.forEach(doc => {
         const data = doc.data();
-        const product = {
+        const product: Product = {
           id: doc.id,
           ...data,
           currentImageIndex: data.currentImageIndex || 0,
@@ -64,13 +78,17 @@ export const useProductsStore = defineStore('products', () => {
   };
 
   // Fetch a specific product by ID from Firestore
-  const fetchProductById = async (id) => {
+  const fetchProductById = async (id: string): Promise<Product | null> => {
     try {
       const docRef = doc(db, "products", id);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        return docSnap.data();
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          ...data
+        } as Product;
       } else {
         console.error("No such document!");
         return null;

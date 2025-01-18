@@ -3,19 +3,20 @@
     <h2 class="form-title">GİRİŞ YAP</h2>
 
     <!-- Hata veya başarı mesajlarının görüntülenmesi -->
-    <div v-if="auth.errorMessage" class="error-message">
-      <p>{{ auth.errorMessage }}</p>
+    <div v-if="errorMessage" class="error-message">
+      <p>{{ errorMessage }}</p>
     </div>
 
-    <div v-if="auth.successMessage" class="success-message">
-      <p>{{ auth.successMessage }}</p>
+    <div v-if="successMessage" class="success-message">
+      <p>{{ successMessage }}</p>
     </div>
 
+    <!-- E-posta ve şifre alanları -->
     <div class="form-group">
       <label for="email">E-posta</label>
       <input
         type="email"
-        v-model="email"
+        v-model="localEmail"
         class="form-control"
         id="email"
         required
@@ -26,7 +27,7 @@
       <label for="password">Şifre</label>
       <input
         type="password"
-        v-model="password"
+        v-model="localPassword"
         class="form-control"
         id="password"
         required
@@ -52,43 +53,46 @@
 
 <script setup>
 import { ref } from "vue";
-import { useAuthStore } from "~/stores/auth"; // Pinia store
-import { useRouter } from "vue-router"; 
+import { defineProps } from "vue";
 
-const email = ref("");
-const password = ref("");
+// Props alımı
+const props = defineProps({
+  errorMessage: {
+    type: String,
+    default: "",
+  },
+  successMessage: {
+    type: String,
+    default: "",
+  },
+  onLogin: {
+    type: Function,
+    required: true,
+  },
+  onRegister: {
+    type: Function,
+    required: true,
+  },
+});
 
-const auth = useAuthStore(); // Pinia store instance
-const router = useRouter(); 
+// Yerel e-posta ve şifre verileri
+const localEmail = ref("");
+const localPassword = ref("");
 
 // Giriş yapma işlemi
-const handleLogin = async () => {
-  try {
-    await auth.login(email.value, password.value);
-    if (auth.user) {
-      router.push("/account"); // Başarılı giriş sonrası yönlendirme
-    }
-  } catch (error) {
-    console.error("Login error:", error.message);
-  }
+const handleLogin = () => {
+  props.onLogin(localEmail.value, localPassword.value);
 };
 
 // Kayıt olma işlemi
-const handleRegister = async () => {
-  try {
-    await auth.register(email.value, password.value);
-    if (auth.user) {
-      router.push("/account"); // Başarılı kayıt sonrası yönlendirme
-    }
-  } catch (error) {
-    console.error("Registration error:", error.message);
-  }
+const handleRegister = () => {
+  props.onRegister(localEmail.value, localPassword.value);
 };
 </script>
 
-<style scoped>
-/* Stil eklemek isterseniz burada stil tanımlamaları yapabilirsiniz */
-</style>
+
+
+
 
 
 <style lang="scss" scoped>

@@ -1,19 +1,20 @@
 <template>
   <nav class="navbar">
+    <!-- Sol Taraf (Menü ve Ara) -->
     <div class="navbar-left">
-      <!-- Menu Button with conditional icon -->
+      <!-- Menü Butonu -->
       <button class="icon-button" @click="toggleMenu">
         <span class="material-icons">{{ isMenuOpen ? 'close' : 'menu' }}</span>
       </button>
-      
-      <!-- Search Button -->
+
+      <!-- Ara Butonu -->
       <button class="text-icon-button">
         <span class="material-icons">search</span>
         <span><div>Ara</div></span>
       </button>
     </div>
 
-    <!-- Logo (Center) -->
+    <!-- Orta Kısım (Logo) -->
     <div class="navbar-center">
       <img
         src="//toucheprive.com/cdn/shop/files/520x200_logo_260x.png?v=1674131476"
@@ -23,8 +24,9 @@
       />
     </div>
 
-    <!-- Account and Cart Buttons (Right) -->
+    <!-- Sağ Taraf (Hesap ve Sepet) -->
     <div class="navbar-right">
+      <!-- Hesap Butonu -->
       <button class="icon-button" @click="navigateToLgn">
         <span
           style="font-family: Open Sans Condensed, sans-serif; font-weight: 700; font-size: 13px;"
@@ -33,6 +35,7 @@
         </span>
       </button>
 
+      <!-- Sepet Butonu -->
       <button class="icon-button" @click="toggleCart">
         <span
           style="font-family: Open Sans Condensed, sans-serif; font-weight: 700; font-size: 13px;"
@@ -43,100 +46,37 @@
       </button>
     </div>
   </nav>
-
-  <!-- Fullscreen Menu -->
-  <div class="fullscreen-menu" v-if="isMenuOpen" @click="toggleMenu">
-    <div class="menu-content">
-      <ul>
-        <li><a href="#">KOLEKSİYONLAR</a></li>
-        <li><a href="#">BÜYÜK TOUCHE İNDİRİMİ</a></li>
-        <li><a href="#" @click.prevent="navigateToAllProduct">TÜM ÜRÜNLER</a></li>
-        <li><a href="#">SON KALANLAR</a></li>
-        <li><a href="#">YENİLER</a></li>
-        <li><a href="#">ÇOK SATANLAR</a></li>
-        <li><a href="#">TRİKO</a></li>
-        <li><a href="#">TAKIM</a></li>
-        <li><a href="#">MONT | KABAN</a></li>
-        <li><a href="#">KAZAK</a></li>
-        <li><a href="#">GÖMLEK</a></li>
-        <li><a href="#">YELEK</a></li>
-        <li><a href="#">PANTALON</a></li>
-        <li><a href="#">ELBİSE</a></li>
-        <li><a href="#">TUNİK</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Cart Sidebar -->
-  <div :class="['cart-sidebar', { active: isCartOpen }]" >
-    <button class="icon-button" style="padding-left: 400px;" @click="toggleCart">
-        <span class="material-icons">close</span>
-      </button>
-
-      <div v-if="cartItems.length > 0">
-    <h2>Sepetiniz</h2>
-    <ul>
-      <li v-for="item in cartItems" :key="item.id">
-        <div>{{ item.name }} - {{ item.quantity }} x {{ item.price }} TL</div>
-        <button @click="removeFromCart(item.id)">Sil</button>
-      </li>
-    </ul>
-    <button @click="clearCart">Sepeti Temizle</button>
-    
-  </div>
-  <div v-else>
-    <div class="cart-container">
-      
-       <div >
-      <button class="icon-button" >
-        <span class="material-symbols-outlined" style="padding-left: 80px; font-size: 40px">shopping_bag</span>
-      </button>
-      <h2 style="font-family: Open Sans Condensed, sans-serif; font-weight: 700; font-size: 25px;">Sepetinde Ürün Yok</h2>
-    </div>
-
-    <button 
-        class="btn btn-submit" 
-        @click="navigateToAllProduct"
-      >
-      <div style="font-family: Open Sans Condensed, sans-serif; font-size: 12px;">ALIŞVERİŞE BAŞLA</div>
-        
-      </button>
-     
-    </div>
-  </div>
-  </div>
-
-  <!-- Overlay (Arka Plan) -->
-  <div v-if="isCartOpen" class="overlay" @click="toggleCart"></div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '~/stores/auth'; 
+// Navbar'da pinia store kullanılacak
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useMenuStore } from '~/stores/menu';
 import { useCartStore } from '~/stores/cart';
-
-const { isAuthenticated } = useAuthStore(); 
+import { useAuthStore } from '~/stores/auth';  // Auth store'ı dahil et
 
 const router = useRouter();
+const menuStore = useMenuStore();  // Menu store'ı dahil et
+const cartStore = useCartStore();  // Cart store'ı dahil et
+const authStore = useAuthStore();  // Auth store'ı dahil et
 
-const isMenuOpen = ref(false);
-const isCartOpen = ref(false); 
+// Menu ve Cart durumları
+const isMenuOpen = computed(() => menuStore.isMenuOpen);
+const isCartOpen = computed(() => cartStore.isCartOpen);
+const isAuthenticated = computed(() => authStore.isAuthenticated); // Kullanıcı doğrulaması
 
-const cartStore = useCartStore();
-const cartItems = computed(() => cartStore.items); // Sepet ürünlerini al
-
-
+// Menü açma/kapama
 const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value;
+  menuStore.toggleMenu(); // Menü durumu değiştir
 };
 
-const toggleCart = (event) => {
-  event.stopPropagation(); 
-  isCartOpen.value = !isCartOpen.value;
+// Sepet açma/kapama
+const toggleCart = () => {
+  cartStore.toggleCart(); // Sepet durumu değiştir
 };
 
+// Sayfa yönlendirmeleri
 const navigateToIndex = () => {
   router.push('/');
 };
@@ -146,26 +86,14 @@ const navigateToAllProduct = () => {
 };
 
 const navigateToLgn = () => {
-  if (isAuthenticated) {
-    router.push('/account');
+  if (isAuthenticated.value) {
+    router.push('/account');  // Eğer giriş yaptıysa account sayfasına yönlendir
   } else {
-    router.push('/lgn');
+    router.push('/lgn');  // Giriş yapmamışsa login sayfasına yönlendir
   }
 };
-
-
-// Sepetten Ürün Silme Fonksiyonu
-const removeFromCart = (productId) => {
-  cartStore.removeFromCart(productId);
-};
-
-// Sepeti Temizleme Fonksiyonu
-const clearCart = () => {
-  cartStore.clearCart();
-};
-
-
 </script>
+
 
 <style scoped>
 /* Navbar styles */
@@ -274,7 +202,7 @@ const clearCart = () => {
   color: #414142;
 }
 
-/* Cart Sidebar Styles */
+
 .cart-sidebar {
   position: fixed;
   top: 0;

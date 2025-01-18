@@ -1,10 +1,10 @@
 <template>
   <div class="row justify-content-center">
-    <div v-for="(item, index) in productsStore.products" :key="item.id" class="product">
+    <div v-for="(item, index) in products" :key="item.id" class="product">
       <div :id="'carouselExampleInterval' + index" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <div class="carousel-image-container" @click="navigateToProduct(item.id)" style="cursor: pointer;">
+            <div class="carousel-image-container" @click="$emit('navigate', item.id)" style="cursor: pointer;">
               <img :src="item.images[item.currentImageIndex]" class="d-block w-100" alt="...">
               <div class="size-box">
                 <p>S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L</p>
@@ -23,11 +23,11 @@
             </div>
           </div>
         </div>
-        <button class="carousel-control-prev" type="button" :data-bs-target="'#carouselExampleInterval' + index" data-bs-slide="prev" @click="prevImage(index)">
+        <button class="carousel-control-prev" type="button" :data-bs-target="'#carouselExampleInterval' + index" data-bs-slide="prev" @click="$emit('prevImage', index)">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next" type="button" :data-bs-target="'#carouselExampleInterval' + index" data-bs-slide="next" @click="nextImage(index)">
+        <button class="carousel-control-next" type="button" :data-bs-target="'#carouselExampleInterval' + index" data-bs-slide="next" @click="$emit('nextImage', index)">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Next</span>
         </button>
@@ -37,43 +37,13 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useProductsStore } from '~/stores/products'; // Pinia store import
-
-// Fetch the products from the Pinia store
-const productsStore = useProductsStore();
-const router = useRouter();
-
-// Fetch all products when component mounts
-onMounted(async () => {
-  await productsStore.fetchAllProducts(); // Tüm ürünleri al
+defineProps({
+  products: Array,
 });
 
-// Navigate to the product detail page
-const navigateToProduct = (id) => {
-  router.push(`/product/${id}`); // Redirect to product detail page
-};
-
-// Image switching functions
-const nextImage = (index) => {
-  const product = productsStore.products[index];
-  if (product && product.images && product.currentImageIndex < product.images.length - 1) {
-    product.currentImageIndex++;
-  } else {
-    product.currentImageIndex = 0; // Loop back to the first image
-  }
-};
-
-const prevImage = (index) => {
-  const product = productsStore.products[index];
-  if (product && product.images && product.currentImageIndex > 0) {
-    product.currentImageIndex--;
-  } else {
-    product.currentImageIndex = product.images.length - 1; // Loop back to the last image
-  }
-};
+defineEmits(['navigate', 'nextImage', 'prevImage']);
 </script>
+
 
 <style scoped>
 html, body {

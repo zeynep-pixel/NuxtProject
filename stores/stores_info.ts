@@ -1,26 +1,33 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { getDocs, collection, getFirestore } from 'firebase/firestore';
-import { useNuxtApp } from '#app'; // To access the app context in Nuxt
+import { getDocs, collection, getFirestore, Firestore } from 'firebase/firestore';
+import { useNuxtApp } from '#app';
+import type { FirebaseApp } from 'firebase/app'; // FirebaseApp türünü içe aktarın
+
+type Store = {
+  id: string;
+  [key: string]: any;
+};
 
 export const useStoresStore = defineStore('stores', () => {
-  const stores = ref([]);
+  const stores = ref<Store[]>([]);
   const { $firebaseApp } = useNuxtApp(); // Access Firebase app from Nuxt context
-  const db = getFirestore($firebaseApp); // Initialize Firestore using the Firebase app
 
-  // Fetch stores from Firestore
-  const fetchStores = async () => {
+  // Tip belirtin
+  const firebaseApp = $firebaseApp as FirebaseApp; // Explicitly cast to FirebaseApp
+  const db: Firestore = getFirestore(firebaseApp); // Initialize Firestore using the Firebase app
+
+  const fetchStores = async (): Promise<void> => {
     try {
       const querySnapshot = await getDocs(collection(db, "stores"));
       stores.value = querySnapshot.docs.map(doc => {
         const data = doc.data();
         console.log(data); // Log the store data for debugging
 
-        // Ensure any required properties are handled
         return {
-          id: doc.id, // You may need to include an id property if not already present in the data
+          id: doc.id,
           ...data,
-        };
+        } as Store;
       });
     } catch (error) {
       console.error("Error fetching stores:", error);

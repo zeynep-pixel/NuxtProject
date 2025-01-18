@@ -1,18 +1,25 @@
 <template>
-    <div>
-      <Nuxt />
-      <Navbar />
-      <Stores />
-      <Footer/>
-    </div>
-  </template>
-  
-  <script setup>
+  <div>
+    <Navbar />
+    <!-- Stores bileşeni Pinia'dan gelen verileri alır -->
+    <Stores :stores="stores" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted } from 'vue';
+import { useStoresStore } from '~/stores/stores_info'; // Pinia Store
+import Stores from '~/components/Stores.vue'; // Stores bileşeni
+import Navbar from '~/components/Navbar.vue'; // Navbar bileşeni
+
+// Pinia Store
+const storesStore = useStoresStore();
+const stores = computed(() => storesStore.stores); // Pinia'daki stores state'ini al
+
+// Sayfa yüklendiğinde mağazaları çek
+onMounted(async () => {
+  await storesStore.fetchStores();
+});
+</script>
 
 
-  // No need to import Footer manually if using Nuxt 3
-  </script>
-  
-  <style scoped>
-  /* Layout special styles (optional) */
-  </style>

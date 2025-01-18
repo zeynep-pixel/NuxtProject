@@ -24,18 +24,14 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useStoresStore } from '~/stores/stores'; // Pinia store import
+import { defineProps } from 'vue';
 
-// Fetch stores from the Pinia store
-const storesStore = useStoresStore();
-
-// Fetch stores when component is mounted
-onMounted(async () => {
-  await storesStore.fetchStores();
+const props = defineProps({
+  stores: {
+    type: Array,
+    required: true,
+  },
 });
-
-const stores = storesStore.stores;
 </script>
 
 
