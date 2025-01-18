@@ -7,7 +7,7 @@
         <h3 class="product-price">{{ product?.price }} TL</h3>
         <p class="product-description">{{ product?.detail }}</p>
         <p class="product-discount">
-          <span style="color: brown;">{{ product?.indirimli }}</span>
+          <span style="color: brown;">{{ product?.indirimli }} TL</span>
         </p>
       </div>
     </div>

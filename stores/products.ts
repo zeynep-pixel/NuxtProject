@@ -7,12 +7,14 @@ import type { FirebaseApp } from 'firebase/app'; // FirebaseApp türü
 // Ürünler için bir TypeScript arayüzü
 export interface Product {
   id: string;
-  name?: string;
+  title?: string;
   description?: string;
   price?: number;
   mainPage?: boolean;
   currentImageIndex?: number;
   images?: string[];
+  color: string;
+  
 }
 
 export const useProductsStore = defineStore('products', () => {
@@ -34,6 +36,7 @@ export const useProductsStore = defineStore('products', () => {
           ...data,
           currentImageIndex: data.currentImageIndex || 0,
           images: data.images || [],
+          color: data.color
         };
 
         // Sadece `mainPage` true olan ürünleri ekle
@@ -63,6 +66,7 @@ export const useProductsStore = defineStore('products', () => {
           ...data,
           currentImageIndex: data.currentImageIndex || 0,
           images: data.images || [],
+          color: data.color
         };
 
         allProducts.push(product); // Tüm ürünleri ekle

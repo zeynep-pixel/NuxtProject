@@ -35,16 +35,30 @@ onMounted(async () => {
 
 // Sepete ekleme fonksiyonu
 const addToCart = (product: Product & { selectedSize: string }) => {
-  const cartItem: CartItem = {
-    id: `${product.id}-${product.selectedSize}`, // Ürün + beden kombinasyonu benzersiz id
-    name: `${product.name} (${product.selectedSize})`,
-    price: product.price || 0,
-    quantity: 1,
-    images: product.images || [], // Görseller
-  };
+  const cartItemId = `${product.id}-${product.selectedSize}`;
+  const existingItem = cartStore.items.find(item => item.id === cartItemId);
 
-  cartStore.addToCart(cartItem); // Pinia store'a ekle
+  console.log('Sepetteki öğeler:', cartStore.items);  // Sepetteki öğeleri kontrol et
+  if (existingItem) {
+    console.log('Mevcut ürün bulundu:', existingItem);
+    existingItem.quantity++;
+  } else {
+    console.log('Yeni ürün ekleniyor');
+    const cartItem: CartItem = {
+      id: cartItemId,
+      title: `${product.title}`,
+      price: product.price || 0,
+      size: product.selectedSize,
+      quantity: 1,
+      images: product.images || [],
+      selectedSize: product.selectedSize,
+      color: product.color
+    };
+    cartStore.addToCart(cartItem);  // Pinia store'a ekle
+  }
 };
+
+
 </script>
 
 <style scoped>

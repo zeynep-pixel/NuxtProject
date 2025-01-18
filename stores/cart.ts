@@ -1,29 +1,50 @@
 import { defineStore } from 'pinia';
+
+// CartItem tipini tanımlayın
 export interface CartItem {
   id: string;
-  name: string;
+  title: string;
   price: number;
   quantity: number;
-  images: Array<string>; 
+  images: string[];
+  color: string;
+  size: string;
+  selectedSize: string;
 }
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    isCartOpen: false,
-    items: [] as CartItem[],
+    items: [] as CartItem[],  // Sepet öğeleri
+    isCartOpen: false,  // Sepet açma kapama durumu
   }),
   actions: {
-    toggleCart() {
-      this.isCartOpen = !this.isCartOpen;
-    },
     addToCart(item: CartItem) {
-      this.items.push(item);
+      const existingItem = this.items.find(i => i.id === item.id);
+      if (existingItem) {
+        existingItem.quantity++; // Eğer ürün zaten varsa, quantity'yi artır
+      } else {
+        this.items.push(item); // Yeni ürün ekle
+      }
     },
-    removeFromCart(itemId: string) {
-      this.items = this.items.filter(item => item.id !== itemId);
+    removeFromCart(productId: string) {
+      this.items = this.items.filter(item => item.id !== productId); // Ürün silme
     },
     clearCart() {
-      this.items = [];
+      this.items = [];  // Sepeti temizleme
+    },
+    toggleCart() {
+      this.isCartOpen = !this.isCartOpen;  // Sepeti açma/kapama
+    },
+  },
+  getters: {
+    totalPrice: (state) => {
+      return state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    },
+    totalQuantity: (state) => {
+      // Sepetteki tüm ürünlerin quantity'sini toplarız
+      return state.items.reduce((total, item) => total + item.quantity, 0);
     },
   },
 });
+
+
