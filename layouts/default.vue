@@ -2,20 +2,20 @@
   <div>
     <!-- Navbar Bileşeni -->
     <Navbar />
-    
+
     <!-- Sayfa İçeriği -->
     <main>
       <NuxtPage />
     </main>
-    
+
     <!-- Footer -->
     <Footer />
-    
+
     <!-- Tam Ekran Menü -->
     <div class="fullscreen-menu" v-if="isMenuOpen" @click="toggleMenu">
       <div class="menu-content">
         <ul style="padding-top: 80px;">
-          <li ><a href="#">KOLEKSİYONLAR</a></li>
+          <li><a href="#">KOLEKSİYONLAR</a></li>
           <li><a href="#">BÜYÜK TOUCHE İNDİRİMİ</a></li>
           <li><a href="#" @click.prevent="navigateToAllProduct">TÜM ÜRÜNLER</a></li>
           <li><a href="#">SON KALANLAR</a></li>
@@ -33,10 +33,10 @@
         </ul>
       </div>
     </div>
-    
+
     <!-- Cart Sidebar (Bileşen Olarak Dahil Edildi) -->
     <CartSidebar />
-    
+
     <!-- Arka Plan (Overlay) -->
     <div v-if="isCartOpen" class="overlay" @click="toggleCart"></div>
   </div>

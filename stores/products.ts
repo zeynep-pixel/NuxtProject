@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getDocs, getDoc, doc, collection, getFirestore } from 'firebase/firestore';
-import { useNuxtApp } from '#app'; // To access Nuxt app context
-import type { FirebaseApp } from 'firebase/app'; // Import FirebaseApp type
+import { useNuxtApp } from '#app'; // Nuxt uygulama bağlamını kullanmak için
+import type { FirebaseApp } from 'firebase/app'; // FirebaseApp türü
 
-// Define a Product interface
-interface Product {
+// Ürünler için bir TypeScript arayüzü
+export interface Product {
   id: string;
   name?: string;
   description?: string;
@@ -16,29 +16,27 @@ interface Product {
 }
 
 export const useProductsStore = defineStore('products', () => {
-  const products = ref<Product[]>([]);
-  const { $firebaseApp } = useNuxtApp(); // Access Firebase app from Nuxt context
+  const products = ref<Product[]>([]); // Ürünler listesi
+  const { $firebaseApp } = useNuxtApp(); // Nuxt bağlamından Firebase uygulamasını alın
+  const db = getFirestore($firebaseApp as FirebaseApp); // Firebase Firestore bağlantısı
 
-  // Assert $firebaseApp is of type FirebaseApp
-  const db = getFirestore($firebaseApp as FirebaseApp); // Cast $firebaseApp to FirebaseApp
-
-  // Fetch products from Firestore where mainPage is true
+  // Firestore'dan `mainPage` true olan ürünleri getir
   const fetchProducts = async (): Promise<void> => {
     try {
-      const querySnapshot = await getDocs(collection(db, "products"));
-      const fetchedProductIds = new Set<string>(); // To avoid duplicates
+      const querySnapshot = await getDocs(collection(db, 'products'));
+      const fetchedProductIds = new Set<string>(); // Tekrarlardan kaçınmak için set kullanımı
       const filteredProducts: Product[] = [];
 
-      querySnapshot.docs.forEach(doc => {
+      querySnapshot.docs.forEach((doc) => {
         const data = doc.data();
         const product: Product = {
           id: doc.id,
           ...data,
           currentImageIndex: data.currentImageIndex || 0,
-          images: data.images || []
+          images: data.images || [],
         };
 
-        // Only add products where mainPage is true
+        // Sadece `mainPage` true olan ürünleri ekle
         if (product.mainPage === true && !fetchedProductIds.has(product.id)) {
           filteredProducts.push(product);
           fetchedProductIds.add(product.id);
@@ -48,53 +46,53 @@ export const useProductsStore = defineStore('products', () => {
       products.value = filteredProducts;
       console.log('Filtered products:', products.value);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error('Error fetching products:', error);
     }
   };
 
-  // Fetch all products from Firestore (without mainPage check)
+  // Firestore'dan tüm ürünleri getir
   const fetchAllProducts = async (): Promise<void> => {
     try {
-      const querySnapshot = await getDocs(collection(db, "products"));
+      const querySnapshot = await getDocs(collection(db, 'products'));
       const allProducts: Product[] = [];
 
-      querySnapshot.docs.forEach(doc => {
+      querySnapshot.docs.forEach((doc) => {
         const data = doc.data();
         const product: Product = {
           id: doc.id,
           ...data,
           currentImageIndex: data.currentImageIndex || 0,
-          images: data.images || []
+          images: data.images || [],
         };
 
-        allProducts.push(product); // Add all products without filtering for mainPage
+        allProducts.push(product); // Tüm ürünleri ekle
       });
 
       products.value = allProducts;
       console.log('All products:', products.value);
     } catch (error) {
-      console.error("Error fetching all products:", error);
+      console.error('Error fetching all products:', error);
     }
   };
 
-  // Fetch a specific product by ID from Firestore
+  // Belirli bir ürün ID'sine göre ürünü getir
   const fetchProductById = async (id: string): Promise<Product | null> => {
     try {
-      const docRef = doc(db, "products", id);
+      const docRef = doc(db, 'products', id);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
         const data = docSnap.data();
         return {
           id: docSnap.id,
-          ...data
+          ...data,
         } as Product;
       } else {
-        console.error("No such document!");
+        console.error('No such document!');
         return null;
       }
     } catch (error) {
-      console.error("Error fetching product:", error);
+      console.error('Error fetching product:', error);
       return null;
     }
   };
