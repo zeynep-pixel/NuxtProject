@@ -27,7 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       user.value = userCredential.user;
-      successMessage.value = "Giriş başarılı!";
+      successMessage.value = "";
       errorMessage.value = ""; // Hata mesajını temizle
       return user.value;
     } catch (error: any) {
